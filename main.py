@@ -14,6 +14,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def read_root():
+    return {"message": "health check ok"}
+
 # Dodanie endpointów z modułów PDF i DOCX
 app.include_router(pdf_router)
 app.include_router(docx_router)
