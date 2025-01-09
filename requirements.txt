@@ -1,0 +1,8 @@
+fastapi  # Framework for building web APIs
+uvicorn  # ASGI server for running FastAPI
+python-docx  # For working with DOCX files (reading, writing)
+pdf2image  # Converts PDF files to images
+Pillow  # Image processing library (used for manipulating images)
+python-multipart  # For handling file uploads in FastAPI
+pymupdf  # For working with PDF files (PyMuPDF)
+docx2pdf  # Converts DOCX files to PDF (works on Windows)
