@@ -14,17 +14,18 @@ def convert_docx_to_pdf(docx_path: str, pdf_path: str):
         from docx2pdf import convert
         print("Using docx2pdf for conversion.")
         convert(docx_path, pdf_path)
-    except ImportError:
-        print("docx2pdf not found, falling back to LibreOffice conversion.")
-        # If docx2pdf isn't available, use LibreOffice
+    except ImportError as e:
+        print(f"docx2pdf not found: {e}, falling back to LibreOffice conversion.")
+        
+        # If docx2pdf isn't available, use LibreOffice for conversion
         system_platform = platform.system()
         if system_platform == "Linux":
             # Linux command for LibreOffice in headless mode
-            command = ["libreoffice", "--headless", "--convert-to", "pdf", docx_path]
+            command = ["libreoffice", "--headless", "--convert-to", "pdf", docx_path, "--outdir", os.path.dirname(pdf_path)]
         elif system_platform == "Windows":
             # Windows command for LibreOffice (update path if needed)
             command = [
-                "C:\\Program Files\\LibreOffice\\program\\soffice.exe", "--headless", "--convert-to", "pdf", docx_path
+                "C:\\Program Files\\LibreOffice\\program\\soffice.exe", "--headless", "--convert-to", "pdf", docx_path, "--outdir", os.path.dirname(pdf_path)
             ]
         else:
             raise Exception(f"Unsupported OS: {system_platform}")
