@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from handlers.pdf_handler import pdf_router
 from handlers.docx_handler import docx_router
+from handlers.docx_handler_libra import docx_router_libra
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -21,3 +22,4 @@ async def read_root():
 # Dodanie endpointów z modułów PDF i DOCX
 app.include_router(pdf_router)
 app.include_router(docx_router)
+app.include_router(docx_router_libra)

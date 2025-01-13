@@ -1,13 +1,23 @@
 import os
-from docx2pdf import convert
+import subprocess
 from fastapi import APIRouter, File, UploadFile
 from io import BytesIO
 import base64
 import fitz  # PyMuPDF
 
-docx_router = APIRouter()
+docx_router_libra = APIRouter()
 
-@docx_router.post("/api/upload_docx/")
+def convert_docx_to_pdf(docx_path: str, pdf_path: str):
+    try:
+        # Use LibreOffice in headless mode to convert DOCX to PDF
+        command = ["libreoffice", "--headless", "--convert-to", "pdf", docx_path, "--outdir", os.path.dirname(pdf_path)]
+        subprocess.run(command, check=True)
+        print(f"LibreOffice conversion successful. PDF saved at {pdf_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during LibreOffice DOCX to PDF conversion: {e}")
+        raise Exception("Failed to convert DOCX to PDF using LibreOffice")
+
+@docx_router_libra.post("/api/upload_docx_libra/")
 async def upload_docx(file: UploadFile = File(...)):
     try:
         print(f"Received file: {file.filename}, type: {file.content_type}")
@@ -24,16 +34,12 @@ async def upload_docx(file: UploadFile = File(...)):
         
         print(f"File saved at {docx_path}")
 
-        # Convert DOCX to PDF
+        # Convert DOCX to PDF using LibreOffice
         pdf_path = os.path.join(temp_dir, f"temp_{file.filename.replace('.docx', '.pdf')}")
-        print(f"Starting conversion of DOCX to PDF...")
+        print(f"Starting conversion of DOCX to PDF using LibreOffice...")
 
-        try:
-            # Perform conversion
-            convert(docx_path, pdf_path)
-        except Exception as conversion_error:
-            print(f"Error during DOCX to PDF conversion: {conversion_error}")
-            raise Exception("Failed to convert DOCX to PDF")
+        # Perform conversion using LibreOffice
+        convert_docx_to_pdf(docx_path, pdf_path)
 
         # Check if the PDF was successfully created
         if not os.path.exists(pdf_path):
@@ -71,13 +77,3 @@ async def upload_docx(file: UploadFile = File(...)):
     except Exception as e:
         print(f"Error during file processing: {e}")
         return {"error": str(e)}
-
-    finally:
-        # Ensure Word application is properly closed by `docx2pdf`
-        from comtypes.client import CreateObject
-        try:
-            word = CreateObject("Word.Application")
-            word.Quit()
-            print("Word application closed successfully")
-        except Exception as word_error:
-            print(f"Error while closing Word application: {word_error}")
