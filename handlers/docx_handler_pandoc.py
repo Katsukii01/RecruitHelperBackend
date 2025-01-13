@@ -15,7 +15,7 @@ def convert_docx_to_pdf(docx_path: str, pdf_path: str):
             print(f"pypandoc output: {output}")
         print(f"pypandoc conversion successful. PDF saved at {pdf_path}")
     except Exception as e:
-        print(f"Error rr during pypandoc DOCX to PDF conversion: {e}")
+        print(f"Error during pypandoc DOCX to PDF conversion: {e}")
         raise Exception("Failed to convert DOCX to PDF using pypandoc")
 
 @docx_router_pandoc.post("/api/upload_docx_pandoc/")
@@ -78,4 +78,3 @@ async def upload_docx(file: UploadFile = File(...)):
     except Exception as e:
         print(f"Error during file processing: {e}")
         return {"error": str(e)}
-    
