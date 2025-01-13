@@ -1,23 +1,24 @@
 import os
-import subprocess
+import pypandoc
 from fastapi import APIRouter, File, UploadFile
 from io import BytesIO
 import base64
 import fitz  # PyMuPDF
 
-docx_router_libra = APIRouter()
+docx_router_pandoc = APIRouter()
 
 def convert_docx_to_pdf(docx_path: str, pdf_path: str):
     try:
-        # Use LibreOffice in headless mode to convert DOCX to PDF
-        command = ["libreoffice", "--headless", "--convert-to", "pdf", docx_path, "--outdir", os.path.dirname(pdf_path)]
-        subprocess.run(command, check=True)
-        print(f"LibreOffice conversion successful. PDF saved at {pdf_path}")
-    except subprocess.CalledProcessError as e:
-        print(f"Error during LibreOffice DOCX to PDF conversion: {e}")
-        raise Exception("Failed to convert DOCX to PDF using LibreOffice")
+        # Use pypandoc to convert DOCX to PDF
+        output = pypandoc.convert_file(docx_path, 'pdf', outputfile=pdf_path)
+        if output:  # If there's any output, it might contain conversion warnings/errors
+            print(f"pypandoc output: {output}")
+        print(f"pypandoc conversion successful. PDF saved at {pdf_path}")
+    except Exception as e:
+        print(f"Error during pypandoc DOCX to PDF conversion: {e}")
+        raise Exception("Failed to convert DOCX to PDF using pypandoc")
 
-@docx_router_libra.post("/api/upload_docx_libra/")
+@docx_router_pandoc.post("/api/upload_docx_pandoc/")
 async def upload_docx(file: UploadFile = File(...)):
     try:
         print(f"Received file: {file.filename}, type: {file.content_type}")
@@ -34,11 +35,11 @@ async def upload_docx(file: UploadFile = File(...)):
         
         print(f"File saved at {docx_path}")
 
-        # Convert DOCX to PDF using LibreOffice
+        # Convert DOCX to PDF using pypandoc
         pdf_path = os.path.join(temp_dir, f"temp_{file.filename.replace('.docx', '.pdf')}")
-        print(f"Starting conversion of DOCX to PDF using LibreOffice...")
+        print(f"Starting conversion of DOCX to PDF using pypandoc...")
 
-        # Perform conversion using LibreOffice
+        # Perform conversion using pypandoc
         convert_docx_to_pdf(docx_path, pdf_path)
 
         # Check if the PDF was successfully created
