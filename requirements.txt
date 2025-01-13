@@ -6,4 +6,3 @@ Pillow  # Image processing library (used for manipulating images)
 python-multipart  # For handling file uploads in FastAPI
 pymupdf  # For working with PDF files (PyMuPDF)
 docx2pdf  # Converts DOCX files to PDF (works on Windows)
-pypandoc  # For converting Markdown to HTML
