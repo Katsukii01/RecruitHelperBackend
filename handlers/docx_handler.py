@@ -1,5 +1,5 @@
 import os
-from docx2pdf import convert
+import pypandoc  # For Linux-compatible DOCX-to-PDF conversion
 from fastapi import APIRouter, File, UploadFile
 from io import BytesIO
 import base64
@@ -24,13 +24,13 @@ async def upload_docx(file: UploadFile = File(...)):
         
         print(f"File saved at {docx_path}")
 
-        # Convert DOCX to PDF
+        # Convert DOCX to PDF using pypandoc
         pdf_path = os.path.join(temp_dir, f"temp_{file.filename.replace('.docx', '.pdf')}")
         print(f"Starting conversion of DOCX to PDF...")
 
         try:
-            # Perform conversion
-            convert(docx_path, pdf_path)
+            # Perform conversion using pypandoc
+            pypandoc.convert_file(docx_path, 'pdf', outputfile=pdf_path)
         except Exception as conversion_error:
             print(f"Error during DOCX to PDF conversion: {conversion_error}")
             raise Exception("Failed to convert DOCX to PDF")
@@ -71,13 +71,3 @@ async def upload_docx(file: UploadFile = File(...)):
     except Exception as e:
         print(f"Error during file processing: {e}")
         return {"error": str(e)}
-
-    finally:
-        # Ensure Word application is properly closed by `docx2pdf`
-        from comtypes.client import CreateObject
-        try:
-            word = CreateObject("Word.Application")
-            word.Quit()
-            print("Word application closed successfully")
-        except Exception as word_error:
-            print(f"Error while closing Word application: {word_error}")
