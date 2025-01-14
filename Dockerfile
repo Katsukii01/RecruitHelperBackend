@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     fonts-dejavu \
     fonts-liberation \
-    ttf-mscorefonts-installer \
+    fonts-crosextra-carlito \
+    fonts-crosextra-caladea \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory inside the container
