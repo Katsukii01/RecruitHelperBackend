@@ -8,15 +8,25 @@ import fitz  # PyMuPDF
 docx_router_pandoc = APIRouter()
 
 def convert_docx_to_pdf(docx_path: str, pdf_path: str):
+    """
+    Converts a DOCX file to PDF using LibreOffice with improved settings to better mimic Microsoft Word's output.
+    """
     try:
-        # Use LibreOffice to convert DOCX to PDF
+        # Ensure the output directory exists
+        os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
+        
+        # Command to use LibreOffice for conversion
         command = [
             "libreoffice", 
-            "--headless",  # Run without GUI
-            "--convert-to", "pdf", 
+            "--headless",         # Run without GUI
+            "--norestore",        # Disable recovery dialog
+            "--nofirststartwizard", # Skip initial setup
+            "--convert-to", "pdf:writer_pdf_Export", # Specify export filter for PDF
             "--outdir", os.path.dirname(pdf_path),
             docx_path
         ]
+
+        # Run the LibreOffice command
         subprocess.run(command, check=True)
         print(f"LibreOffice conversion successful. PDF saved at {pdf_path}")
     except subprocess.CalledProcessError as e:

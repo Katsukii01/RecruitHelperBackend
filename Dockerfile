@@ -1,13 +1,16 @@
 # Use the official Python image
 FROM python:3.9-slim
 
-# Install system dependencies (LibreOffice and necessary packages)
+# Install system dependencies (LibreOffice, fonts, and necessary packages)
 RUN apt-get update && apt-get install -y \
     libreoffice \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
-    && rm -rf /var/lib/apt/lists/*
+    fonts-dejavu \
+    fonts-liberation \
+    ttf-mscorefonts-installer \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory inside the container
 WORKDIR /app
