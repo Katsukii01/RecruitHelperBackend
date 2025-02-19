@@ -1,5 +1,4 @@
 from fastapi import APIRouter, File, UploadFile
-from io import BytesIO
 import base64
 import os
 import fitz  # PyMuPDF
@@ -13,44 +12,50 @@ async def upload_pdf(file: UploadFile = File(...)):
         
         # Ensure the temp_files directory exists
         temp_dir = "temp_files"
-        os.makedirs(temp_dir, exist_ok=True)  # Create the directory if it doesn't exist
+        os.makedirs(temp_dir, exist_ok=True)
 
         contents = await file.read()
-        # Save the uploaded PDF temporarily
         pdf_path = os.path.join(temp_dir, f"temp_{file.filename}")
+
         with open(pdf_path, "wb") as f:
             f.write(contents)
         
         print(f"File saved at {pdf_path}")
 
-        # Check if the file exists and is accessible
         if not os.path.exists(pdf_path):
             return {"error": f"File not found at {pdf_path}"}
 
         # Open the PDF with PyMuPDF
         doc = fitz.open(pdf_path)
 
-        # Prepare a list to hold base64-encoded image previews
-        image_previews = []
+        image_previews = []  # Store base64-encoded images
+        extracted_text = []   # Store extracted text
 
-        # Loop through all pages and convert them to images
-        for page_num in range(min(3, len(doc))):  # Limiting to 3 pages for previews
-            page = doc.load_page(page_num)  # Load the page
-            pix = page.get_pixmap(dpi=300)  # Render the page as an image at 300 dpi
-            img_bytes = pix.tobytes("png")  # Convert the image to PNG bytes
-            
-            # Encode the image in base64
+        for page_num in range(len(doc)):  # Process all pages
+            page = doc.load_page(page_num)  
+
+            # Extract text
+            text = page.get_text("text").strip()
+            if text:
+                extracted_text.append(text)
+
+            # Generate image preview
+            pix = page.get_pixmap(dpi=300)  # Higher DPI for better quality
+            img_bytes = pix.tobytes("png")  
             img_base64 = base64.b64encode(img_bytes).decode("utf-8")
             image_previews.append(f"data:image/png;base64,{img_base64}")
 
-        # Explicitly close the document to release any file locks
         doc.close()
-
-        # Remove the temporary PDF file
         os.remove(pdf_path)
 
-        print(f"Returning image previews as base64")
-        return {"previews": image_previews}
+        # Combine extracted text into a single string
+        full_text = "\n\n".join(extracted_text)
+
+        print(f"Returning image previews and extracted text")
+        return {
+            "previews": image_previews,  # All pages as images
+            "content": full_text  # Full extracted text
+        }
 
     except Exception as e:
         print(f"Error during file processing: {e}")
