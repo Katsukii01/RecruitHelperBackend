@@ -11,3 +11,4 @@ torch           # For NLP models, used for analyzing text
 torchvision     # For NLP models, used for analyzing text
 torchaudio      # For NLP models, used for analyzing text
 python-dotenv   # For loading environment variables from a .env file
+openai          # For using  OPENROUTER API
