@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer, util
 
-letter_router = APIRouter()
+letter_MiniLM_router = APIRouter()
 
 # Wczytanie modelu NLP do porównywania tekstów
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
@@ -32,6 +32,9 @@ def calculate_match_score(cover_letter: str, job_data: JobRequirements) -> int:
     Required Skills: {', '.join(job_data.skills)}
     Required Languages: {', '.join([f"{lang['language']} ({lang['level']})" for lang in job_data.languages])}
     """
+
+    print(job_info)
+    print(cover_letter)
 
     embeddings = model.encode([cover_letter, job_info], convert_to_tensor=True)
     similarity_score = util.pytorch_cos_sim(embeddings[0], embeddings[1]).item()
@@ -86,7 +89,7 @@ def generate_feedback_for_recruiter(cover_letter: str, job_data: JobRequirements
 
 
 
-@letter_router.post("/api/analyze_letter/")
+@letter_MiniLM_router.post("/api/analyze_letter_MiniLM/")
 async def analyze_letter(request: AnalyzeRequest):
     try:
         score = calculate_match_score(request.cover_letter_content, request.job_requirements)
