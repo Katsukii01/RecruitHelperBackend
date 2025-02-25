@@ -6,7 +6,7 @@ import os
 import re
 import time
 
-letter_Deepseek_router = APIRouter()
+letter_router = APIRouter()
 
 # Załaduj zmienne środowiskowe z pliku .env
 load_dotenv()
@@ -56,7 +56,7 @@ def analyze_letter(cover_letter: str, job_data: JobRequirements) -> dict:
     ]
 
     completion = client.chat.completions.create(
-        model="deepseek/deepseek-r1:free",
+        model="google/gemini-2.0-pro-exp-02-05:free",
         messages=messages
     )
     
@@ -71,7 +71,7 @@ def analyze_letter(cover_letter: str, job_data: JobRequirements) -> dict:
     
     return {"score": score, "feedback": feedback}
 
-@letter_Deepseek_router.post("/api/analyze_letter_Deepseek/")
+@letter_router.post("/api/analyze_letter/")
 async def analyze_letter_endpoint(request: AnalyzeRequest):
     try:
         start_time = time.time()

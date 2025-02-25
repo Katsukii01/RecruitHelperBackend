@@ -132,7 +132,7 @@ def extract_cv_data(cv_text: str) -> dict:
     finally:
         return extracted_data
 
-@cv_analysis_router.post("/api/analyze_cv_Deepseek")
+@cv_analysis_router.post("/api/analyze_cv")
 async def extract_cv_data_endpoint(request: CVRequest):
     try:
         start_time = time.time()
