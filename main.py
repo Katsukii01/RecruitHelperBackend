@@ -4,8 +4,13 @@ from handlers.docx_handler import docx_router
 from handlers.letter_analyze_handler_MiniLM import letter_MiniLM_router
 from handlers.letter_analyze_handler import letter_router
 from handlers.cv_analyze_handler import cv_analysis_router
+from handlers.get_firebase_users_handler import get_firebase_users_router
+from handlers.delete_firebase_user_handler import delete_firebase_user_router
+from handlers.edit_firebase_user_handler import edit_firebase_user_router
 
 from fastapi.middleware.cors import CORSMiddleware
+
+import firebase_config  # Import config file for Firebase
 
 app = FastAPI()
 
@@ -27,3 +32,6 @@ app.include_router(docx_router)
 app.include_router(letter_MiniLM_router)
 app.include_router(letter_router)
 app.include_router(cv_analysis_router)
+app.include_router(get_firebase_users_router)
+app.include_router(delete_firebase_user_router)
+app.include_router(edit_firebase_user_router)

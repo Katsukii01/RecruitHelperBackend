@@ -6,6 +6,9 @@ env.bak/
 venv.bak/
 .env
 
+# Ignore recruithelper-28345-firebase-adminsdk-xjvio-a3d4585078.json file
+recruithelper-28345-firebase-adminsdk-xjvio-a3d4585078.json
+
 # Python cache files
 __pycache__/
 *.pyc
