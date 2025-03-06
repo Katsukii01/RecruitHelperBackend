@@ -6,10 +6,6 @@ Pillow          # Image processing library (used for manipulating images)
 python-multipart # For handling file uploads in FastAPI
 pymupdf         # For working with PDF files (PyMuPDF)
 docx2pdf        # Converts DOCX files to PDF (works on Windows)
-sentence-transformers  # For analyzing text
-torch           # For NLP models, used for analyzing text
-torchvision     # For NLP models, used for analyzing text
-torchaudio      # For NLP models, used for analyzing text
 python-dotenv   # For loading environment variables from a .env file
 openai          # For using  OPENROUTER API
 firebase-admin  # For interacting with Firebase services
