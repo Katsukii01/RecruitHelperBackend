@@ -55,20 +55,35 @@ def analyze_letter(cover_letter: str, job_data: JobRequirements) -> dict:
         """}
     ]
 
-    completion = client.chat.completions.create(
-        model="google/gemini-2.0-pro-exp-02-05:free",
-        messages=messages
-    )
-    
-    response_text = completion.choices[0].message.content
-    print(response_text)  # Debugging output to check the response
+    try:
+        completion = client.chat.completions.create(
+            model="google/gemini-2.0-pro-exp-02-05:free",
+            messages=messages
+        )
 
-    score_match = re.search(r"\*\*Score:\*\* (\d+)/100", response_text)
-    feedback_match = re.search(r"\*\*Feedback:\*\* (.+)", response_text)
-    
-    score = int(score_match.group(1)) if score_match else 0
-    feedback = feedback_match.group(1).strip() if feedback_match else "Could not extract feedback."
-    
+        if not completion or not completion.choices or not completion.choices[0].message:
+            print("⚠️ Błąd: Pusta odpowiedź API.")
+            return {"score": 0, "feedback": "Could not analyze the cover letter."}
+
+        response_text = completion.choices[0].message.content or ""
+        print("🔍 Odpowiedź API:", response_text)  # Debugowanie
+
+        # Szukanie wyniku w odpowiedzi
+        score_match = re.search(r"\b(?:Score|Ocena):\s*(\d{1,3})\b", response_text, re.IGNORECASE)
+        feedback_match = re.search(r"\b(?:Feedback|Opinia):\s*(.+)", response_text, re.IGNORECASE)
+
+        score = int(score_match.group(1)) if score_match else 0
+        feedback = feedback_match.group(1).strip() if feedback_match else "Could not extract feedback."
+
+        # Upewniamy się, że wynik jest w zakresie 0-100
+        if not (0 <= score <= 100):
+            print("⚠️ Błędny wynik:", score)
+            score = 0
+
+    except Exception as e:
+        print(f"❌ Błąd analizy: {e}")
+        return {"score": 0, "feedback": "An error occurred while analyzing the letter."}
+
     return {"score": score, "feedback": feedback}
 
 @letter_router.post("/api/analyze_letter/")

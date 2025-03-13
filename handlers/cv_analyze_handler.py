@@ -26,7 +26,7 @@ class CVRequest(BaseModel):
 
 
 
-def extract_cv_data(cv_text: str) -> dict:
+async def extract_cv_data(cv_text: str) -> dict:
     extracted_data = {
             "name": "",
             "surname": "",
@@ -89,15 +89,16 @@ def extract_cv_data(cv_text: str) -> dict:
     ]
 
     completion = client.chat.completions.create(
-        model="google/gemini-2.0-pro-exp-02-05:free",
-        messages=messages
-    )
+            model="google/gemini-2.0-pro-exp-02-05:free",
+            messages=messages
+        )
 
+    if not completion or not completion.choices or not completion.choices[0].message:
+        print("⚠️ Błąd: Odpowiedź API jest pusta lub niepoprawna")
+        return extracted_data  # Zwróć pustą strukturę, zamiast błędu
+
+    response_text = completion.choices[0].message.content or ""
     
-
-    response_text = completion.choices[0].message.content
-    
-
     try:
         print(" JSON first:", response_text)
         response = re.sub(r"^```json|```$", "", response_text).strip()
@@ -115,15 +116,15 @@ def extract_cv_data(cv_text: str) -> dict:
             "Native": "C2 (Proficient)"
         }
 
-        if "languages" in extracted_data:
+        if "languages" in extracted_data and isinstance(extracted_data["languages"], list):
             extracted_data["languages"] = [
-                {
-                    "language": lang.get("language", ""),
-                    "level": valid_cefr_levels.get(lang.get("level"), "")
-                }
-                for lang in extracted_data["languages"]
-                if lang.get("level") in valid_cefr_levels
-            ]
+            {
+                "language": lang.get("language", ""),
+                "level": valid_cefr_levels.get(lang.get("level"), "") if lang.get("level") in valid_cefr_levels else ""
+            }
+            for lang in extracted_data["languages"]
+            if isinstance(lang, dict) and "level" in lang and lang["level"] in valid_cefr_levels
+        ]
 
     except json.JSONDecodeError as e:
         print("❌ Błąd dekodowania JSON:", e)
@@ -136,7 +137,7 @@ def extract_cv_data(cv_text: str) -> dict:
 async def extract_cv_data_endpoint(request: CVRequest):
     try:
         start_time = time.time()
-        result = extract_cv_data(request.cv_text)
+        result = await extract_cv_data(request.cv_text)
         end_time = time.time()
         print(f"Response Time: {end_time - start_time} seconds") 
         return result
