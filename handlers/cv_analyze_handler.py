@@ -89,7 +89,7 @@ async def extract_cv_data(cv_text: str) -> dict:
     ]
 
     completion = client.chat.completions.create(
-            model="google/gemini-2.5-pro-exp-03-25:free",
+            model="google/gemini-2.0-flash-thinking-exp:free",
             messages=messages
         )
 
