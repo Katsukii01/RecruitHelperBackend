@@ -57,7 +57,7 @@ def analyze_letter(cover_letter: str, job_data: JobRequirements) -> dict:
 
     try:
         completion = client.chat.completions.create(
-            model="google/gemini-2.0-flash-thinking-exp:free",
+            model="google/gemma-3-27b-it:free",
             messages=messages
         )
 

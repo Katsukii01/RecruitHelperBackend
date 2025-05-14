@@ -89,7 +89,7 @@ async def extract_cv_data(cv_text: str) -> dict:
     ]
 
     completion = client.chat.completions.create(
-            model="google/gemini-2.0-flash-thinking-exp:free",
+            model="google/gemma-3-27b-it:free",
             messages=messages
         )
 
@@ -101,7 +101,7 @@ async def extract_cv_data(cv_text: str) -> dict:
     
     try:
         print(" JSON first:", response_text)
-        response = re.sub(r"^```json|```$", "", response_text).strip()
+        response = re.sub(r"^```json\s*|\s*```$", "", response_text.strip(), flags=re.DOTALL)
         extracted_data = json.loads(response)
         print("✅ JSON poprawnie sparsowany:", extracted_data)
 
